@@ -1,4 +1,7 @@
+import 'package:absen/views/homepage.dart';
+import 'package:absen/widget/bottom_nav.dart';
 import 'package:absen/widget/classs.dart';
+import 'package:absen/widget/login_button.dart';
 import 'package:flutter/material.dart';
 
 class Login extends StatefulWidget {
@@ -16,31 +19,11 @@ class _LoginState extends State<Login> {
 
   bool isLoading = false;
 
-  Future<void> login() async {
-    if (!_formKey.currentState!.validate()) return;
-
-    setState(() => isLoading = true);
-
-    // contoh proses login
-    await Future.delayed(const Duration(seconds: 2));
-
-    setState(() => isLoading = false);
-
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(const SnackBar(content: Text("Login sukses")));
-
-    // pindah page
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (_) => const Placeholder()),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Login")),
+      backgroundColor: Colors.white,
+      appBar: AppBar(title: const Text("Login"), backgroundColor: Colors.white),
       body: Padding(
         padding: const EdgeInsets.all(20),
         child: Form(
@@ -73,19 +56,25 @@ class _LoginState extends State<Login> {
                     v == null || v.length < 6 ? "Minimal 6 karakter" : null,
               ),
 
-              const SizedBox(height: 15),
+              SizedBox(height: 25),
 
-              const SizedBox(height: 25),
+              LoginButton(
+                text: "Login",
+                isLoading: isLoading,
+                onPressed: () {
+                  if (_formKey.currentState!.validate()) {
+                    setState(() => isLoading = true);
 
-              SizedBox(
-                width: double.infinity,
-                height: 50,
-                child: ElevatedButton(
-                  onPressed: isLoading ? null : login,
-                  child: isLoading
-                      ? const CircularProgressIndicator(color: Colors.white)
-                      : const Text("Login"),
-                ),
+                    Future.delayed(Duration(seconds: 2), () {
+                      setState(() => isLoading = false);
+
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => BottomNav()),
+                      );
+                    });
+                  }
+                },
               ),
             ],
           ),

@@ -7,6 +7,7 @@ import 'package:absen/models/register_model.dart';
 import 'package:absen/models/training_model.dart';
 import 'package:absen/service/api.dart';
 import 'package:absen/views/login.dart';
+import 'package:absen/widget/classs.dart';
 import 'package:absen/widget/login_button.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -14,7 +15,7 @@ import 'package:image_picker/image_picker.dart';
 
 class Register extends StatefulWidget {
   const Register({super.key});
-  static const id = "/register_day34";
+  static const id = "/register";
 
   @override
   State<Register> createState() => _RegisterState();
@@ -379,13 +380,12 @@ class _RegisterState extends State<Register> {
                               user.data!.token!,
                             );
                           }
+                          await PreferenceHandler.userName;
 
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(builder: (context) => Login()),
                           );
-
-                          // context.pushReplacement(DrawerWidgetDay15());
                         } catch (e) {
                           Fluttertoast.showToast(msg: e.toString());
                           setState(() {
@@ -495,6 +495,7 @@ class _RegisterState extends State<Register> {
     bool isPassword = false,
     TextEditingController? controller,
     String? Function(String?)? validator,
+    bool isVisibility = false,
   }) {
     return TextFormField(
       validator: validator,
@@ -538,19 +539,4 @@ class _RegisterState extends State<Register> {
 
   SizedBox height(double height) => SizedBox(height: height);
   SizedBox width(double width) => SizedBox(width: width);
-
-  Widget buildTitle(String text) {
-    return Row(
-      children: [
-        Text(
-          text,
-          style: const TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.bold,
-            // color: AppColor.gray88,
-          ),
-        ),
-      ],
-    );
-  }
 }
