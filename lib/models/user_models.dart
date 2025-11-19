@@ -1,17 +1,21 @@
+// To parse this JSON data, do
+//
+//     final getUserModel = getUserModelFromJson(jsonString);
+
 import 'dart:convert';
 
-ProfileModel profileModelFromJson(String str) =>
-    ProfileModel.fromJson(json.decode(str));
+GetUserModel getUserModelFromJson(String str) =>
+    GetUserModel.fromJson(json.decode(str));
 
-String profileModelToJson(ProfileModel data) => json.encode(data.toJson());
+String getUserModelToJson(GetUserModel data) => json.encode(data.toJson());
 
-class ProfileModel {
+class GetUserModel {
   String? message;
   Data? data;
 
-  ProfileModel({this.message, this.data});
+  GetUserModel({this.message, this.data});
 
-  factory ProfileModel.fromJson(Map<String, dynamic> json) => ProfileModel(
+  factory GetUserModel.fromJson(Map<String, dynamic> json) => GetUserModel(
     message: json["message"],
     data: json["data"] == null ? null : Data.fromJson(json["data"]),
   );
@@ -27,9 +31,9 @@ class Data {
   String? trainingTitle;
   Batch? batch;
   Training? training;
-  dynamic jenisKelamin;
-  String? profilePhoto;
-  String? profilePhotoUrl;
+  String? jenisKelamin;
+  dynamic profilePhoto;
+  dynamic profilePhotoUrl;
 
   Data({
     this.id,
@@ -78,8 +82,8 @@ class Batch {
   String? batchKe;
   DateTime? startDate;
   DateTime? endDate;
-  DateTime? createdAt;
-  DateTime? updatedAt;
+  String? createdAt;
+  String? updatedAt;
 
   Batch({
     this.id,
@@ -97,12 +101,8 @@ class Batch {
         ? null
         : DateTime.parse(json["start_date"]),
     endDate: json["end_date"] == null ? null : DateTime.parse(json["end_date"]),
-    createdAt: json["created_at"] == null
-        ? null
-        : DateTime.parse(json["created_at"]),
-    updatedAt: json["updated_at"] == null
-        ? null
-        : DateTime.parse(json["updated_at"]),
+    createdAt: json["created_at"],
+    updatedAt: json["updated_at"],
   );
 
   Map<String, dynamic> toJson() => {
@@ -112,8 +112,8 @@ class Batch {
         "${startDate!.year.toString().padLeft(4, '0')}-${startDate!.month.toString().padLeft(2, '0')}-${startDate!.day.toString().padLeft(2, '0')}",
     "end_date":
         "${endDate!.year.toString().padLeft(4, '0')}-${endDate!.month.toString().padLeft(2, '0')}-${endDate!.day.toString().padLeft(2, '0')}",
-    "created_at": createdAt?.toIso8601String(),
-    "updated_at": updatedAt?.toIso8601String(),
+    "created_at": createdAt,
+    "updated_at": updatedAt,
   };
 }
 
@@ -124,8 +124,8 @@ class Training {
   dynamic participantCount;
   dynamic standard;
   dynamic duration;
-  DateTime? createdAt;
-  DateTime? updatedAt;
+  String? createdAt;
+  String? updatedAt;
 
   Training({
     this.id,
@@ -145,12 +145,8 @@ class Training {
     participantCount: json["participant_count"],
     standard: json["standard"],
     duration: json["duration"],
-    createdAt: json["created_at"] == null
-        ? null
-        : DateTime.parse(json["created_at"]),
-    updatedAt: json["updated_at"] == null
-        ? null
-        : DateTime.parse(json["updated_at"]),
+    createdAt: json["created_at"],
+    updatedAt: json["updated_at"],
   );
 
   Map<String, dynamic> toJson() => {
@@ -160,7 +156,7 @@ class Training {
     "participant_count": participantCount,
     "standard": standard,
     "duration": duration,
-    "created_at": createdAt?.toIso8601String(),
-    "updated_at": updatedAt?.toIso8601String(),
+    "created_at": createdAt,
+    "updated_at": updatedAt,
   };
 }

@@ -1,3 +1,4 @@
+import 'package:absen/service/api.dart';
 import 'package:absen/views/homepage.dart';
 import 'package:absen/widget/bottom_nav.dart';
 import 'package:absen/widget/classs.dart';
@@ -47,13 +48,19 @@ class _LoginState extends State<Login> {
               // --- Password ---
               SizedBox(height: 16),
               buildTitle("Password"),
-              SizedBox(height: 8),
-              buildTextFieldnoButton(
-                controller: passwordController,
+              SizedBox(height: 12),
+              buildTextField(
                 hintText: "Enter your password",
                 isPassword: true,
-                validator: (v) =>
-                    v == null || v.length < 6 ? "Minimal 6 karakter" : null,
+                controller: passwordController,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return "Password tidak boleh kosong";
+                  } else if (value.length < 6) {
+                    return "Password minimal 6 karakter";
+                  }
+                  return null;
+                },
               ),
 
               SizedBox(height: 25),
@@ -61,18 +68,35 @@ class _LoginState extends State<Login> {
               LoginButton(
                 text: "Login",
                 isLoading: isLoading,
-                onPressed: () {
+                onPressed: () async {
                   if (_formKey.currentState!.validate()) {
                     setState(() => isLoading = true);
 
-                    Future.delayed(Duration(seconds: 2), () {
+                    try {
+                      final result = await AuthAPI.loginUser(
+                        email: emailController.text.trim(),
+                        password: passwordController.text.trim(),
+                      );
+
                       setState(() => isLoading = false);
 
-                      Navigator.push(
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(result.message ?? "Login berhasil"),
+                        ),
+                      );
+
+                      Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(builder: (_) => BottomNav()),
                       );
-                    });
+                    } catch (e) {
+                      setState(() => isLoading = false);
+
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text("Login gagal: $e")),
+                      );
+                    }
                   }
                 },
               ),

@@ -1,3 +1,4 @@
+import 'package:absen/service/api.dart';
 import 'package:flutter/material.dart';
 import 'package:absen/models/profile_model.dart';
 
@@ -11,17 +12,47 @@ class EditProfile extends StatefulWidget {
 }
 
 class _EditProfileState extends State<EditProfile> {
+  Future<void> saveProfile() async {
+    if (nameController.text.isEmpty) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Nama tidak boleh kosong")));
+      return;
+    }
+
+    try {
+      bool success = await ProfileService.updateProfile(nameController.text);
+      print(success);
+
+      if (success) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text("Profil berhasil disimpan")));
+
+        Navigator.pop(context, true);
+      } else {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text("Gagal menyimpan profil")));
+      }
+    } catch (e) {
+      print(e);
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Terjadi kesalahan")));
+    }
+  }
+
   late TextEditingController nameController;
-  late TextEditingController emailController;
-  String gender = "L"; // default value
 
   @override
   void initState() {
     super.initState();
 
-    nameController = TextEditingController(text: widget.profile.name ?? "");
-    emailController = TextEditingController(text: widget.profile.email ?? "");
-    // gender = widget.profile.jenisKelamin ?? "L";
+    // Hanya nama yang bisa diedit
+    nameController = TextEditingController(
+      text: widget.profile.data?.name ?? "",
+    );
   }
 
   @override
@@ -40,7 +71,7 @@ class _EditProfileState extends State<EditProfile> {
         padding: EdgeInsets.all(20),
         child: Column(
           children: [
-            // ----------------- FOTO PROFIL -----------------
+            // FOTO PROFIL
             Center(
               child: CircleAvatar(
                 radius: 50,
@@ -51,17 +82,67 @@ class _EditProfileState extends State<EditProfile> {
 
             SizedBox(height: 30),
 
-            // ----------------- NAME FIELD -----------------
+            // =====================
+            // NAMA - Editable
+            // =====================
             buildTitle("Nama Lengkap"),
             SizedBox(height: 6),
             buildTextField(
               controller: nameController,
-              hint: "Masukkan nama Anda",
+              hint: "Masukkan nama lengkap",
+              enabled: true,
             ),
 
             SizedBox(height: 20),
 
-            // ----------------- SAVE BUTTON -----------------
+            // =====================
+            // EMAIL - NON EDITABLE
+            // =====================
+            buildTitle("Email"),
+            SizedBox(height: 6),
+            buildTextField(
+              controller: TextEditingController(
+                text: widget.profile.data?.email ?? "-",
+              ),
+              hint: "Email",
+              enabled: false,
+            ),
+
+            SizedBox(height: 20),
+
+            // =====================
+            // JENIS KELAMIN - NON EDITABLE
+            // =====================
+            buildTitle("Jenis Kelamin"),
+            SizedBox(height: 6),
+            buildTextField(
+              controller: TextEditingController(
+                text: widget.profile.data?.jenisKelamin == "L"
+                    ? "Laki-laki"
+                    : "Perempuan",
+              ),
+              hint: "Jenis Kelamin",
+              enabled: false,
+            ),
+
+            SizedBox(height: 20),
+
+            // =====================
+            // BATCH - NON EDITABLE
+            // =====================
+            buildTitle("Batch"),
+            SizedBox(height: 6),
+            buildTextField(
+              controller: TextEditingController(
+                text: widget.profile.data?.batchKe ?? "-",
+              ),
+              hint: "Batch",
+              enabled: false,
+            ),
+
+            SizedBox(height: 30),
+
+            // BUTTON SAVE
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.black,
@@ -72,11 +153,7 @@ class _EditProfileState extends State<EditProfile> {
                 ),
               ),
               onPressed: () {
-                print("Profile disimpan...");
-                print("Name: ${nameController.text}");
-                print("Gender: $gender");
-
-                // TODO: tambahkan API update profile
+                saveProfile();
               },
               child: Row(
                 mainAxisSize: MainAxisSize.min,
@@ -118,7 +195,7 @@ class _EditProfileState extends State<EditProfile> {
       decoration: InputDecoration(
         hintText: hint,
         filled: true,
-        fillColor: Colors.white,
+        fillColor: enabled ? Colors.white : Colors.grey.shade200,
         contentPadding: EdgeInsets.symmetric(vertical: 14, horizontal: 16),
         enabledBorder: OutlineInputBorder(
           borderSide: BorderSide(color: Colors.black),

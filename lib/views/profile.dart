@@ -1,8 +1,10 @@
 import 'package:absen/views/edit_profile.dart';
+import 'package:absen/views/register.dart';
 import 'package:flutter/material.dart';
 import 'package:absen/models/profile_model.dart';
 import 'package:absen/constant/preference_handler.dart';
 import 'package:absen/service/api.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Profile extends StatefulWidget {
   const Profile({super.key});
@@ -34,6 +36,17 @@ class _ProfilePageState extends State<Profile> {
       print("Error: $e");
       setState(() => loading = false);
     }
+  }
+
+  Future<void> logout(BuildContext context) async {
+    final prefs = await SharedPreferences.getInstance();
+
+    await prefs.clear();
+
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => Register()),
+    );
   }
 
   @override
@@ -71,7 +84,7 @@ class _ProfilePageState extends State<Profile> {
                         ),
                         SizedBox(height: 12),
                         Text(
-                          profile?.name ?? "-",
+                          profile?.data?.name ?? "-",
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 22,
@@ -80,7 +93,7 @@ class _ProfilePageState extends State<Profile> {
                         ),
                         SizedBox(height: 4),
                         Text(
-                          profile?.email ?? "-",
+                          profile?.data?.email ?? "-",
                           style: TextStyle(color: Colors.white70, fontSize: 15),
                         ),
                       ],
@@ -101,11 +114,17 @@ class _ProfilePageState extends State<Profile> {
                     ),
                     child: Column(
                       children: [
-                        buildInfoRow("Jenis kelamin", profile?.name ?? "-"),
+                        buildInfoRow(
+                          "Jenis kelamin",
+                          profile?.data?.jenisKelamin ?? "-",
+                        ),
                         Divider(),
-                        buildInfoRow("Batch", profile?.email ?? "-"),
+                        buildInfoRow("Batch", profile?.data?.batchKe ?? "-"),
                         Divider(),
-                        buildInfoRow("Training", profile?.email ?? "-"),
+                        buildInfoRow(
+                          "Training",
+                          profile?.data?.training?.title ?? "-",
+                        ),
                       ],
                     ),
                   ),
@@ -125,12 +144,12 @@ class _ProfilePageState extends State<Profile> {
                       ),
                     ),
                     onPressed: () {
-                      // Navigator.push(
-                      //   context,
-                      //   MaterialPageRoute(
-                      //     builder: (context) => const EditProfile(),
-                      //   ),
-                      // );
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => EditProfile(profile: profile!),
+                        ),
+                      );
                     },
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -143,21 +162,9 @@ class _ProfilePageState extends State<Profile> {
                   ),
 
                   SizedBox(height: 16),
-
-                  OutlinedButton(
-                    style: OutlinedButton.styleFrom(
-                      side: BorderSide(color: Colors.black),
-                      padding: EdgeInsets.symmetric(
-                        vertical: 14,
-                        horizontal: 25,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    onPressed: () {
-                      // PreferenceHandler.logout();
-                      Navigator.pushReplacementNamed(context, "/login");
+                  GestureDetector(
+                    onTap: () {
+                      logout(context);
                     },
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -176,15 +183,26 @@ class _ProfilePageState extends State<Profile> {
 
   Widget buildInfoRow(String title, String value) {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          title,
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+        Expanded(
+          flex: 3,
+          child: Text(
+            title,
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+          ),
         ),
-        Text(
-          value,
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        SizedBox(width: 12),
+        Expanded(
+          flex: 4,
+          child: Text(
+            value,
+            textAlign: TextAlign.right,
+            softWrap: true,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          ),
         ),
       ],
     );

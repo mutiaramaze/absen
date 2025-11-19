@@ -2,13 +2,17 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:absen/constant/endpoint.dart';
+import 'package:absen/constant/preference_handler.dart';
 import 'package:absen/models/batch_model.dart';
 import 'package:absen/models/checkin_model.dart';
 import 'package:absen/models/checkout_model.dart';
+import 'package:absen/models/login_model.dart';
 import 'package:absen/models/profile_model.dart';
 import 'package:absen/models/register_model.dart';
 import 'package:absen/models/training_model.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthAPI {
   static Future<RegisterModel> registerUser({
@@ -43,6 +47,36 @@ class AuthAPI {
     } else {
       final error = json.decode(response.body);
       throw Exception(error["message"] ?? "Terjadi kesalahan");
+    }
+  }
+
+  static Future<LoginModel> loginUser({
+    required String email,
+    required String password,
+  }) async {
+    final url = Uri.parse(Endpoint.login);
+
+    final response = await http.post(
+      url,
+      headers: {"Accept": "application/json"},
+      body: {"email": email, "password": password},
+    );
+
+    log("LOGIN STATUS: ${response.statusCode}");
+    log("LOGIN BODY: ${response.body}");
+
+    final res = LoginModel.fromJson(json.decode(response.body));
+
+    if (response.statusCode == 200) {
+      // Simpan token
+      await PreferenceHandler.saveToken(res.data?.token ?? "");
+
+      // Simpan nama user
+      await PreferenceHandler.saveName(res.data?.user?.name ?? "");
+
+      return res;
+    } else {
+      throw Exception(res.message ?? "Login gagal");
     }
   }
 }
@@ -88,13 +122,14 @@ class TrainingAPI {
 }
 
 class ApiService {
-  static const String baseUrl = "https://absensib1.mobileprojp.com/api";
+  static const String baseUrl = "https://appabsensi.mobileprojp.com/api";
 
   static Future<ProfileModel> getProfile(String token) async {
     final response = await http.get(
-      Uri.parse("$baseUrl/profile"),
-      headers: {"Authorization": "Bearer $token"},
+      Uri.parse(Endpoint.profile),
+      headers: {"Authorization": "Bearer $token", "Accept": "application/json"},
     );
+    print(response.body);
 
     if (response.statusCode == 200) {
       return ProfileModel.fromJson(json.decode(response.body));
@@ -114,15 +149,25 @@ class CheckInAPI {
   }) async {
     final url = Uri.parse(Endpoint.checkIn);
 
+    final body = {
+      "attendance_date": DateFormat("yyyy-MM-dd").format(DateTime.now()),
+      "check_in": DateFormat("HH:mm").format(DateTime.now()),
+      "check_in_lat": lat.toString(),
+      "check_in_lng": lng.toString(),
+      "check_in_location": location,
+      "check_in_address": address,
+    };
+
+    log("CHECK IN SEND: $body");
+
     final response = await http.post(
       url,
-      headers: {"Accept": "application/json", "Authorization": "Bearer $token"},
-      body: {
-        "check_in_lat": lat.toString(),
-        "check_in_lng": lng.toString(),
-        "check_in_location": location,
-        "check_in_address": address,
+      headers: {
+        "Accept": "application/json",
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Authorization": "Bearer $token",
       },
+      body: body,
     );
 
     log("CHECK IN STATUS: ${response.statusCode}");
@@ -147,15 +192,21 @@ class CheckOutAPI {
   }) async {
     final url = Uri.parse(Endpoint.checkOut);
 
+    final body = {
+      "attendance_date": DateFormat("yyyy-MM-dd").format(DateTime.now()),
+      "check_out": DateFormat("HH:mm").format(DateTime.now()),
+      "check_out_lat": lat.toString(),
+      "check_out_lng": lng.toString(),
+      "check_out_location": location,
+      "check_out_address": address,
+    };
+
+    log("CHECK OUT SEND: $body");
+
     final response = await http.post(
       url,
       headers: {"Accept": "application/json", "Authorization": "Bearer $token"},
-      body: {
-        "check_out_lat": lat.toString(),
-        "check_out_lng": lng.toString(),
-        "check_out_location": location,
-        "check_out_address": address,
-      },
+      body: body,
     );
 
     log("CHECK OUT STATUS: ${response.statusCode}");
@@ -167,5 +218,24 @@ class CheckOutAPI {
       final error = json.decode(response.body);
       throw Exception(error["message"] ?? "Gagal Check Out");
     }
+  }
+}
+
+class ProfileService {
+  static Future<bool> updateProfile(String newName) async {
+    final token = PreferenceHandler.getToken();
+
+    if (token == null) return false;
+
+    final response = await http.put(
+      Uri.parse("${Endpoint.baseUrl}/api/profile"),
+      headers: {"Accept": "application/json", "Authorization": "Bearer $token"},
+      body: {"name": newName},
+    );
+
+    print("STATUS: ${response.statusCode}");
+    print("RESPONSE: ${response.body}");
+
+    return response.statusCode == 200;
   }
 }

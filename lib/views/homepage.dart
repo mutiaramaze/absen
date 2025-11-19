@@ -16,6 +16,7 @@ class Homepage extends StatefulWidget {
 }
 
 class _HomepageState extends State<Homepage> {
+  String userName = "";
   GoogleMapController? _googleMapController;
   LatLng _currentPosition = LatLng(-6.2000, 108.816666);
   String _currentAddress = "Mengambil lokasi...";
@@ -28,8 +29,16 @@ class _HomepageState extends State<Homepage> {
   @override
   void initState() {
     super.initState();
+    loadUserName();
     getDataProfile();
     _getCurrentLocation();
+  }
+
+  Future<void> loadUserName() async {
+    String? savedName = await PreferenceHandler.getName();
+    setState(() {
+      userName = savedName ?? "";
+    });
   }
 
   Future<void> _getCurrentLocation() async {
@@ -83,12 +92,15 @@ class _HomepageState extends State<Homepage> {
   }
 
   Future<void> getDataProfile() async {
-    String token = "TOKEN_KAMU"; // TODO: ambil dari SharedPreferences
+    String token =
+        await PreferenceHandler.getToken(); // TODO: ambil dari SharedPreferences
 
     try {
       final data = await ApiService.getProfile(token);
+      print('data: ${data.data!.name}');
       setState(() {
         profile = data;
+        userName = data.data!.name!;
         loading = false;
       });
     } catch (e) {
@@ -101,7 +113,7 @@ class _HomepageState extends State<Homepage> {
   Widget build(BuildContext context) {
     String today = DateFormat(
       "EEEE, dd MMMM yyyy",
-      "id_ID",
+      "en_US",
     ).format(DateTime.now());
 
     return Scaffold(
@@ -125,7 +137,7 @@ class _HomepageState extends State<Homepage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "Halo, ${profile?.name ?? ""}",
+                            "Hello, $userName",
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: 22,

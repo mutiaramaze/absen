@@ -1,4 +1,7 @@
+import 'package:absen/models/attedence_models.dart';
+import 'package:absen/service/absensi_api.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class History extends StatefulWidget {
   const History({super.key});
@@ -9,9 +12,7 @@ class History extends StatefulWidget {
 
 class _HistoryState extends State<History> {
   bool loading = true;
-
-  // Contoh dummy data (nanti bisa diganti API)
-  List<Map<String, dynamic>> history = [];
+  List<DataAttend> history = [];
 
   @override
   void initState() {
@@ -20,33 +21,33 @@ class _HistoryState extends State<History> {
   }
 
   Future<void> loadHistory() async {
-    await Future.delayed(Duration(seconds: 1));
+    try {
+      final res = await AbsensiAPI.getHistory();
 
-    // Nanti ini diganti API history kamu
-    history = [
-      {
-        "date": "2025-02-10",
-        "check_in": "08:12",
-        "check_out": "17:01",
-        "status": "Hadir",
-      },
-      {
-        "date": "2025-02-09",
-        "check_in": "08:45",
-        "check_out": "17:10",
-        "status": "Hadir",
-      },
-      {
-        "date": "2025-02-08",
-        "check_in": "-",
-        "check_out": "-",
-        "status": "Izin",
-      },
-    ];
+      /// Sort: terbaru → terlama
+      res.sort((a, b) {
+        final ad = a.attendanceDate ?? '';
+        final bd = b.attendanceDate ?? '';
+        return bd.compareTo(ad);
+      });
 
-    setState(() {
-      loading = false;
-    });
+      setState(() {
+        history = res;
+        loading = false;
+      });
+    } catch (e) {
+      setState(() => loading = false);
+    }
+  }
+
+  String formatDate(String? dateStr) {
+    if (dateStr == null || dateStr.isEmpty) return "-";
+    try {
+      final date = DateTime.parse(dateStr);
+      return DateFormat("yyyy-MM-dd").format(date);
+    } catch (_) {
+      return dateStr;
+    }
   }
 
   @override
@@ -57,26 +58,41 @@ class _HistoryState extends State<History> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        title: Text("History Absensi", style: TextStyle(color: Colors.black)),
+        title: const Text(
+          "History Absensi",
+          style: TextStyle(color: Colors.black),
+        ),
         automaticallyImplyLeading: false,
       ),
 
       body: loading
-          ? Center(child: CircularProgressIndicator(color: Colors.black))
+          ? const Center(child: CircularProgressIndicator(color: Colors.black))
+          : history.isEmpty
+          ? const Center(
+              child: Text(
+                "Belum ada riwayat absensi",
+                style: TextStyle(fontSize: 16, color: Colors.black54),
+              ),
+            )
           : ListView.builder(
-              padding: EdgeInsets.all(20),
+              padding: const EdgeInsets.all(20),
               itemCount: history.length,
               itemBuilder: (context, index) {
                 final item = history[index];
 
+                final date = formatDate(item.attendanceDate);
+                final checkIn = item.checkInTime ?? "-";
+                final checkOut = item.checkOutTime ?? "-";
+                final status = item.status ?? "-";
+
                 return Container(
-                  margin: EdgeInsets.only(bottom: 16),
-                  padding: EdgeInsets.all(16),
+                  margin: const EdgeInsets.only(bottom: 16),
+                  padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(color: Colors.black),
-                    boxShadow: [
+                    boxShadow: const [
                       BoxShadow(
                         color: Colors.black12,
                         blurRadius: 3,
@@ -87,24 +103,24 @@ class _HistoryState extends State<History> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Date
+                      // Tanggal
                       Text(
-                        item["date"],
-                        style: TextStyle(
+                        date,
+                        style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
                           color: Colors.black,
                         ),
                       ),
 
-                      SizedBox(height: 8),
+                      const SizedBox(height: 8),
 
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          infoColumn("Check In", item["check_in"]),
-                          infoColumn("Check Out", item["check_out"]),
-                          statusBox(item["status"]),
+                          infoColumn("Check In", checkIn),
+                          infoColumn("Check Out", checkOut),
+                          statusBox(status),
                         ],
                       ),
                     ],
@@ -119,11 +135,14 @@ class _HistoryState extends State<History> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(title, style: TextStyle(color: Colors.black54, fontSize: 13)),
-        SizedBox(height: 4),
+        Text(
+          title,
+          style: const TextStyle(color: Colors.black54, fontSize: 13),
+        ),
+        const SizedBox(height: 4),
         Text(
           value,
-          style: TextStyle(
+          style: const TextStyle(
             color: Colors.black,
             fontSize: 15,
             fontWeight: FontWeight.bold,
@@ -134,10 +153,24 @@ class _HistoryState extends State<History> {
   }
 
   Widget statusBox(String status) {
-    Color statusColor = status == "Hadir" ? Colors.green : Colors.orange;
+    Color statusColor;
+
+    switch (status.toLowerCase()) {
+      case "hadir":
+        statusColor = Colors.green;
+        break;
+      case "izin":
+        statusColor = Colors.orange;
+        break;
+      case "alpha":
+        statusColor = Colors.red;
+        break;
+      default:
+        statusColor = Colors.blueGrey;
+    }
 
     return Container(
-      padding: EdgeInsets.symmetric(vertical: 6, horizontal: 12),
+      padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(8),
         color: statusColor.withOpacity(0.15),

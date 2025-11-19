@@ -490,53 +490,6 @@ class _RegisterState extends State<Register> {
     );
   }
 
-  TextFormField buildTextField({
-    String? hintText,
-    bool isPassword = false,
-    TextEditingController? controller,
-    String? Function(String?)? validator,
-    bool isVisibility = false,
-  }) {
-    return TextFormField(
-      validator: validator,
-      controller: controller,
-      obscureText: isPassword ? isVisibility : false,
-      decoration: InputDecoration(
-        hintText: hintText,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(32),
-          borderSide: BorderSide(
-            color: Colors.black.withOpacity(0.2),
-            width: 1.0,
-          ),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(32),
-          borderSide: const BorderSide(color: Colors.black, width: 1.0),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(32),
-          borderSide: BorderSide(
-            color: Colors.black.withOpacity(0.2),
-            width: 1.0,
-          ),
-        ),
-        suffixIcon: isPassword
-            ? IconButton(
-                onPressed: () {
-                  setState(() {
-                    isVisibility = !isVisibility;
-                  });
-                },
-                icon: Icon(
-                  isVisibility ? Icons.visibility_off : Icons.visibility,
-                ),
-              )
-            : null,
-      ),
-    );
-  }
-
   SizedBox height(double height) => SizedBox(height: height);
   SizedBox width(double width) => SizedBox(width: width);
 }
