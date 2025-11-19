@@ -222,20 +222,70 @@ class CheckOutAPI {
 }
 
 class ProfileService {
+  // Mengembalikan true kalau berhasil (HTTP 2xx), false kalau gagal
   static Future<bool> updateProfile(String newName) async {
-    final token = PreferenceHandler.getToken();
+    // Dapatkan token secara asynchronous
+    final token = await PreferenceHandler.getToken();
 
-    if (token == null) return false;
+    // cek token null/empty
+    if (token == null || token.isEmpty) {
+      print('updateProfile: token kosong');
+      return false;
+    }
+
+    // Gunakan Endpoint.profile agar path selalu konsisten
+    final uri = Uri.parse(
+      Endpoint.profile,
+    ); // pastikan Endpoint.profile = 'https://.../api/profile'
 
     final response = await http.put(
-      Uri.parse("${Endpoint.baseUrl}/api/profile"),
-      headers: {"Accept": "application/json", "Authorization": "Bearer $token"},
+      uri,
+      headers: {
+        "Accept": "application/json",
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Authorization": "Bearer $token",
+      },
       body: {"name": newName},
     );
 
     print("STATUS: ${response.statusCode}");
     print("RESPONSE: ${response.body}");
 
-    return response.statusCode == 200;
+    // treat any 2xx as success
+    return response.statusCode >= 200 && response.statusCode < 300;
+  }
+
+  // (Opsi) versi yang mengembalikan response body / ProfileModel
+  static Future<Map<String, dynamic>> updateProfileWithDetail(
+    String newName,
+  ) async {
+    final token = await PreferenceHandler.getToken();
+    if (token == null || token.isEmpty) {
+      throw Exception('Token tidak ditemukan');
+    }
+    final uri = Uri.parse(Endpoint.profile);
+    final response = await http.put(
+      uri,
+      headers: {
+        "Accept": "application/json",
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Authorization": "Bearer $token",
+      },
+      body: {"name": newName},
+    );
+
+    print("STATUS: ${response.statusCode}");
+    print("RESPONSE: ${response.body}");
+
+    final body = json.decode(response.body);
+    if (response.statusCode >= 200 && response.statusCode < 300) {
+      return body; // caller bisa parse jadi ProfileModel jika perlu
+    } else {
+      // ambil pesan detail bila ada
+      final msg = body is Map
+          ? (body['message'] ?? body['errors'] ?? response.body)
+          : response.body;
+      throw Exception(msg.toString());
+    }
   }
 }
