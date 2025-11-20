@@ -3,6 +3,8 @@ import 'dart:developer';
 
 import 'package:absen/constant/endpoint.dart';
 import 'package:absen/constant/preference_handler.dart';
+import 'package:absen/models/attedence_models.dart';
+import 'package:absen/models/attendance_stats_model.dart';
 import 'package:absen/models/batch_model.dart';
 import 'package:absen/models/checkin_model.dart';
 import 'package:absen/models/checkout_model.dart';
@@ -286,6 +288,31 @@ class ProfileService {
           ? (body['message'] ?? body['errors'] ?? response.body)
           : response.body;
       throw Exception(msg.toString());
+    }
+  }
+
+  static Future<AttendanceStatistics> getStats() async {
+    final url = Uri.parse(
+      Endpoint.statistik,
+    ); // pastikan Endpoint.statistik benar
+    final token = await PreferenceHandler.getToken();
+
+    final res = await http.get(
+      url,
+      headers: {
+        "Accept": "application/json",
+        if (token != null && token.isNotEmpty) "Authorization": "Bearer $token",
+      },
+    );
+
+    if (res.statusCode == 200) {
+      final jsonBody = jsonDecode(res.body);
+      // Pastikan DataAttend.fromJson menangani struktur JSON
+      return AttendanceStatistics.fromJson(jsonBody);
+    } else {
+      throw Exception(
+        'Failed to load attendance stats: ${res.statusCode} ${res.body}',
+      );
     }
   }
 }

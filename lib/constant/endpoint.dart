@@ -7,4 +7,5 @@ class Endpoint {
   static const checkIn = '$baseUrl/api/absen/check-in';
   static const checkOut = '$baseUrl/api/absen/check-out';
   static const profile = '$baseUrl/api/profile';
+  static const statistik = '$baseUrl/api/stats';
 }

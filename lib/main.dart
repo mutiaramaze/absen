@@ -1,3 +1,4 @@
+import 'package:absen/views/login.dart';
 import 'package:absen/views/register.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -34,7 +35,7 @@ class MyApp extends StatelessWidget {
         // tested with just a hot reload.
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: const Register(),
+      home: const Login(),
     );
   }
 }
