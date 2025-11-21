@@ -224,6 +224,7 @@ class _RegisterState extends State<Register> {
               SizedBox(
                 width: half,
                 child: DropdownButtonFormField<String>(
+                  dropdownColor: Colors.white,
                   value: selectedGender,
                   isDense: true,
                   isExpanded: true,
@@ -249,6 +250,7 @@ class _RegisterState extends State<Register> {
               SizedBox(
                 width: half,
                 child: DropdownButtonFormField<int>(
+                  dropdownColor: Colors.white,
                   value: selectedTrainingId,
                   isDense: true,
                   isExpanded: true,
@@ -298,6 +300,7 @@ class _RegisterState extends State<Register> {
               ),
               const SizedBox(height: 10),
               DropdownButtonFormField<int>(
+                dropdownColor: Colors.white,
                 value: selectedTrainingId,
                 isDense: true,
                 isExpanded: true,
@@ -506,6 +509,7 @@ class _RegisterState extends State<Register> {
                           isLoadingDropdown
                               ? const Center(child: CircularProgressIndicator())
                               : DropdownButtonFormField<int>(
+                                  dropdownColor: Colors.white,
                                   value: selectedBatchId,
                                   isDense: true,
                                   isExpanded: true,
@@ -566,6 +570,7 @@ class _RegisterState extends State<Register> {
                                   : const Text(
                                       "Daftar",
                                       style: TextStyle(
+                                        color: Colors.white,
                                         fontSize: 16,
                                         fontWeight: FontWeight.w600,
                                       ),
@@ -595,7 +600,10 @@ class _RegisterState extends State<Register> {
                                 },
                                 child: const Text(
                                   "Masuk",
-                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                               ),
                             ],

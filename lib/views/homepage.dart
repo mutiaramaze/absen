@@ -289,7 +289,10 @@ class _HomepageState extends State<Homepage> {
                   ),
                   TextButton(
                     onPressed: _loadStats,
-                    child: const Text("Lihat detail"),
+                    child: const Text(
+                      "Lihat detail",
+                      style: TextStyle(color: Colors.black),
+                    ),
                   ),
                 ],
               ),
@@ -441,10 +444,10 @@ class _HomepageState extends State<Homepage> {
                 ).showSnackBar(SnackBar(content: Text("Check In gagal: $e")));
               }
             },
-            icon: const Icon(Icons.login),
+            icon: const Icon(Icons.login, color: Colors.white),
             label: const Padding(
               padding: EdgeInsets.symmetric(vertical: 14),
-              child: Text("Check In"),
+              child: Text("Check In", style: TextStyle(color: Colors.white)),
             ),
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.green,
@@ -491,10 +494,10 @@ class _HomepageState extends State<Homepage> {
                 ).showSnackBar(SnackBar(content: Text("Check Out gagal: $e")));
               }
             },
-            icon: const Icon(Icons.logout),
+            icon: const Icon(Icons.logout, color: Colors.white),
             label: const Padding(
               padding: EdgeInsets.symmetric(vertical: 14),
-              child: Text("Check Out"),
+              child: Text("Check Out", style: TextStyle(color: Colors.white)),
             ),
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.red,
@@ -512,7 +515,7 @@ class _HomepageState extends State<Homepage> {
   Widget build(BuildContext context) {
     String today = DateFormat(
       "EEEE, dd MMMM yyyy",
-      "id_ID",
+      "en_US",
     ).format(DateTime.now());
 
     return Scaffold(
@@ -533,7 +536,7 @@ class _HomepageState extends State<Homepage> {
                       padding: const EdgeInsets.all(18),
                       decoration: BoxDecoration(
                         gradient: const LinearGradient(
-                          colors: [Color(0xFF222222), Color(0xFF555555)],
+                          colors: [Color(0xFFF1F3551), Color(0xFFBFD9E8)],
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                         ),
@@ -598,7 +601,7 @@ class _HomepageState extends State<Homepage> {
 
                     // map section
                     const Text(
-                      "Lokasi Anda",
+                      "Your Location",
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,

@@ -124,7 +124,11 @@ class _LoginState extends State<Login> {
                         Container(
                           padding: const EdgeInsets.all(10),
                           decoration: BoxDecoration(
-                            color: Colors.white24,
+                            gradient: const LinearGradient(
+                              colors: [Color(0xFFF1F3551), Color(0xFFBFD9E8)],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
                             borderRadius: BorderRadius.circular(10),
                           ),
                           child: const Icon(
@@ -266,6 +270,7 @@ class _LoginState extends State<Login> {
                                     : const Text(
                                         "Login",
                                         style: TextStyle(
+                                          color: Colors.white,
                                           fontSize: 16,
                                           fontWeight: FontWeight.w600,
                                         ),
@@ -293,7 +298,7 @@ class _LoginState extends State<Login> {
                                   child: Text(
                                     "Register",
                                     style: TextStyle(
-                                      color: Colors.blue.shade700,
+                                      color: Colors.black,
                                       fontWeight: FontWeight.w600,
                                     ),
                                   ),

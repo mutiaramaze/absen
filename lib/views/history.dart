@@ -49,7 +49,7 @@ class _HistoryState extends State<History> {
     try {
       final date = DateTime.parse(dateStr);
       // contoh: Sen, 21 Jul 2025
-      return DateFormat("EEE, dd MMM yyyy", "id_ID").format(date);
+      return DateFormat("EEE, dd MMM yyyy", "en_US").format(date);
     } catch (_) {
       return dateStr;
     }
@@ -81,7 +81,7 @@ class _HistoryState extends State<History> {
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [Color(0xFF2F2F2F), Color(0xFF6B6B6B)],
+                  colors: [Color(0xFFF1F3551), Color(0xFFBFD9E8)],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),

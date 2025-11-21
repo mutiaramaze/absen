@@ -52,9 +52,9 @@ class _ProfilePageState extends State<Profile> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xFFF7F8FA),
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: Color(0xFFF7F8FA),
         automaticallyImplyLeading: false,
         title: Text("Profile", style: TextStyle(color: Colors.black)),
       ),
@@ -68,7 +68,11 @@ class _ProfilePageState extends State<Profile> {
                     width: double.infinity,
                     padding: EdgeInsets.symmetric(vertical: 30),
                     decoration: BoxDecoration(
-                      color: Colors.black,
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFFF1F3551), Color(0xFFBFD9E8)],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: Column(
