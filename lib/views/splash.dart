@@ -39,7 +39,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(children: [Image.asset("assets/images/Timeyos.png")]),
+      body: Column(children: [Image.asset("assets/images/timeyos.png")]),
     );
   }
 }

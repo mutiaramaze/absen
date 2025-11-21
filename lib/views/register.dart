@@ -278,6 +278,7 @@ class _RegisterState extends State<Register> {
           return Column(
             children: [
               DropdownButtonFormField<String>(
+                dropdownColor: Colors.white,
                 value: selectedGender,
                 isDense: true,
                 isExpanded: true,
